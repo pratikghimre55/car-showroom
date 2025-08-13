@@ -1,69 +1,57 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 
-const cars = [
-  {
-    id: 1,
-    image: '/cars/bmw-m5-2023.jpg',
-    brand: 'BMW',
-    model: 'M5 Competition',
-    year: 2023,
-    transmission: 'Automatic',
-    kmDriven: '12,000 km',
-  },
-  {
-    id: 2,
-    image: '/cars/bmw-m5-2022.jpg',
-    brand: 'BMW',
-    model: 'M5 CS',
-    year: 2022,
-    transmission: 'Automatic',
-    kmDriven: '8,500 km',
-  },
-  {
-    id: 3,
-    image: '/cars/bmw-m5-2021.jpg',
-    brand: 'BMW',
-    model: 'M5',
-    year: 2021,
-    transmission: 'Automatic',
-    kmDriven: '20,000 km',
-  },
-  {
-    id: 4,
-    image: '/cars/bmw-m5-2020.jpg',
-    brand: 'BMW',
-    model: 'M5 Competition',
-    year: 2020,
-    transmission: 'Automatic',
-    kmDriven: '25,000 km',
-  },
-  {
-    id: 5,
-    image: '/cars/bmw-m5-2019.jpg',
-    brand: 'BMW',
-    model: 'M5',
-    year: 2019,
-    transmission: 'Automatic',
-    kmDriven: '30,000 km',
-  },
-]
+interface Car {
+  id: number
+  image: string
+  brand: string
+  model: string
+  year: number
+  transmission: string
+  kmDriven: string
+}
 
 const CarList = () => {
+  const [cars, setCars] = useState<Car[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [direction, setDirection] = useState(0)
+
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const response = await fetch('/api/cars', {
+          next: { revalidate: 3600 },
+        })
+        if (!response.ok) throw new Error('Failed to fetch cars')
+
+        const data: Car[] = await response.json()
+        setCars(data)
+        setLoading(false)
+      } catch {
+        setError('Failed to load cars')
+        setLoading(false)
+      }
+    }
+    fetchCars()
+  }, [])
 
   const handleNext = () => {
+    setDirection(1)
     setCurrentIndex((prev) => (prev + 1) % cars.length)
   }
 
   const handlePrev = () => {
+    setDirection(-1)
     setCurrentIndex((prev) => (prev - 1 + cars.length) % cars.length)
   }
 
   const visibleCars = () => {
+    if (cars.length === 0) return []
     const indices = [
       (currentIndex - 1 + cars.length) % cars.length,
       currentIndex,
@@ -72,81 +60,128 @@ const CarList = () => {
     return indices.map((index) => cars[index])
   }
 
+  // Variants for smoother transitions
+  const cardVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 300 : -300,
+      opacity: 0,
+      scale: 0.9,
+    }),
+    center: (index: number) => ({
+      x: 0,
+      opacity: index === 1 ? 1 : 0.6,
+      scale: index === 1 ? 1 : 0.92,
+      transition: {
+        x: { type: 'spring', stiffness: 300, damping: 30 },
+        opacity: { duration: 0.4 },
+        scale: { duration: 0.4 },
+      },
+    }),
+    exit: (dir: number) => ({
+      x: dir > 0 ? -300 : 300,
+      opacity: 0,
+      scale: 0.9,
+    }),
+  }
+
+  if (loading || error) {
+    return (
+      <section className="relative min-h-screen w-full bg-black py-12 sm:py-16">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center mb-8 md:mb-12">
+          FEATURED CARS
+        </h2>
+        <div className="text-center text-white">
+          {loading ? 'Loading...' : <span className="text-red-500">{error}</span>}
+        </div>
+      </section>
+    )
+  }
+
   return (
-    <section id="cars" className="relative min-h-screen w-full bg-black py-16">
+    <section id="cars" className="relative min-h-screen w-full bg-black py-12 sm:py-16">
       {/* Heading */}
-      <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-12">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center mb-8 md:mb-12">
         FEATURED CARS
       </h2>
 
-      {/* Carousel Container */}
-      <div className="relative max-w-7xl mx-auto px-4">
-        {/* Fade Effect Overlays */}
-        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent z-10" />
-        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent z-10" />
+      <div className="relative max-w-[90%] sm:max-w-6xl mx-auto px-4">
+        {/* Fade overlays */}
+        <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent z-10" />
+        <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent z-10" />
+
+        {/* Arrows */}
+        <button
+          onClick={handlePrev}
+          className="absolute -left-12 text-white text-3xl p-3 hover:bg-white/10 rounded-full z-20"
+        >
+          <FiArrowLeft />
+        </button>
+        <button
+          onClick={handleNext}
+          className="absolute -right-12 text-white text-3xl p-3 hover:bg-white/10 rounded-full z-20"
+        >
+          <FiArrowRight />
+        </button>
 
         {/* Carousel */}
         <div className="flex items-center justify-center">
-          {/* Left Arrow */}
-          <button
-            onClick={handlePrev}
-            className="absolute left-0 md:left-4 text-white text-3xl p-2 hover:bg-white/20 rounded-full transition-colors z-20"
-          >
-            <FiArrowLeft />
-          </button>
-
-          {/* Car Cards */}
           <div className="flex justify-center gap-4 overflow-hidden">
-            {visibleCars().map((car, index) => (
-              <motion.div
-                key={car.id}
-                className={`relative w-64 md:w-80 h-96 rounded-lg overflow-hidden ${
-                  index !== 1 ? 'opacity-50 scale-90' : 'opacity-100 scale-100'
-                }`}
-                initial={{ opacity: 0, x: index === 0 ? -100 : 100 }}
-                animate={{ opacity: index !== 1 ? 0.5 : 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <img
-                  src={car.image}
-                  alt={car.model}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-            ))}
+            <AnimatePresence initial={false} custom={direction}>
+              {visibleCars().map((car, index) => (
+                <motion.div
+                  key={car.id}
+                  custom={index === 1 ? 0 : direction}
+                  variants={cardVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.6, ease: 'easeInOut' }}
+                  className={`relative rounded-lg overflow-hidden ${
+                    index === 1
+                      ? 'w-104 sm:w-120 md:w-136 h-120 sm:h-136 md:h-156 shadow-lg'
+                      : 'hidden sm:flex w-64 sm:w-72 md:w-80 h-72 sm:h-80 md:h-96'
+                  }`}
+                >
+                  <img src={car.image} alt={car.model} className="w-full h-full object-cover" />
+                  {index !== 1 && (
+                    <div
+                      className={`absolute inset-0 ${
+                        index === 0
+                          ? 'bg-gradient-to-l from-black/60 to-transparent'
+                          : 'bg-gradient-to-r from-black/60 to-transparent'
+                      }`}
+                    />
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
-
-          {/* Right Arrow */}
-          <button
-            onClick={handleNext}
-            className="absolute right-0 md:right-4 text-white text-3xl p-2 hover:bg-white/20 rounded-full transition-colors z-20"
-          >
-            <FiArrowRight />
-          </button>
         </div>
 
-        {/* Car Details */}
+        {/* Car details */}
         <AnimatePresence mode="wait">
           <motion.div
             key={cars[currentIndex].id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.5 }}
             className="text-center text-white mt-8"
           >
-            <h3 className="text-2xl font-bold">{cars[currentIndex].brand} {cars[currentIndex].model}</h3>
-            <p className="text-gray-300 mt-2">Year: {cars[currentIndex].year}</p>
+            <h3 className="text-2xl font-bold">
+              {cars[currentIndex].brand} {cars[currentIndex].model}
+            </h3>
+            <p className="text-gray-300">Year: {cars[currentIndex].year}</p>
             <p className="text-gray-300">Transmission: {cars[currentIndex].transmission}</p>
             <p className="text-gray-300">KM Driven: {cars[currentIndex].kmDriven}</p>
           </motion.div>
         </AnimatePresence>
 
-        {/* See More Cars Button */}
-        <div className="text-center mt-12">
+        {/* Button */}
+        <div className="text-center mt-10">
           <a
             href="/cars"
-            className="inline-block bg-white text-black px-6 py-3 rounded-full font-semibold hover:bg-blue-500 hover:text-white transition-colors"
+            className="inline-block bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-blue-600 hover:text-white transition-colors"
           >
             See More Cars
           </a>
