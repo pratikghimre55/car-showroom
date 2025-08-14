@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
-import Image from "next/image"
+import Image from 'next/image'
 
 interface Car {
   id: number
@@ -143,7 +143,13 @@ const CarList = () => {
                       : 'hidden sm:flex w-64 sm:w-72 md:w-80 h-72 sm:h-80 md:h-96'
                   }`}
                 >
-                  <Image src={car.image} alt={car.model} className="w-full h-full object-cover" />
+                  <Image
+                    src={car.image}
+                    alt={car.model}
+                    width={800} 
+                    height={600}
+                    className="w-full h-full object-cover"
+                  />
                   {index !== 1 && (
                     <div
                       className={`absolute inset-0 ${
