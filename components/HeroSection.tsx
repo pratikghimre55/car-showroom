@@ -74,7 +74,7 @@ const HeroSection = () => {
         <header className="fixed top-0 left-0 w-full flex items-center justify-between px-6 md:px-12 py-6 z-20">
           {/* Logo */}
           <div className="text-white font-bold text-2xl md:text-4xl tracking-wide select-none">
-            BMW M5
+            CAR BUZZ
           </div>
 
           {/* Search Bar */}
@@ -142,18 +142,19 @@ const HeroSection = () => {
               exit={{ opacity: 0, y: '-15%' }}
               transition={{ duration: 1.2, ease: 'easeInOut' }}
             >
-              <h1 className="text-5xl md:text-7xl font-bold tracking-widest drop-shadow-lg">
+              <h1 className="text-6xl md:text-8xl font-bold tracking-widest drop-shadow-lg">
                 LUXURY
               </h1>
-              <h2 className="text-xl md:text-2xl font-light tracking-wider mt-4 drop-shadow">
+              <h2 className="text-2xl md:text-4xl font-light tracking-wider mt-6 drop-shadow">
                 REDEFINED
               </h2>
-              <p className="text-gray-300 mt-6 text-center max-w-md md:max-w-2xl text-sm md:text-base">
+              <p className="text-gray-300 mt-8 text-center max-w-2xl md:max-w-4xl text-lg md:text-2xl leading-relaxed">
                 Experience unparalleled performance, sophistication, and innovation with the BMW M5 – where luxury meets precision.
               </p>
             </motion.div>
           )}
         </AnimatePresence>
+
 
         {/* Floating Menu */}
         <FloatingMenu open={menuOpen} onClose={() => setMenuOpen(false)} />

@@ -24,7 +24,7 @@ const ContactUs = () => {
       >
         {/* Logo and Tagline */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold">ABZ</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">CAR BUZZ</h1>
           <p className="text-sm sm:text-base">Elevating Pre-Owned Luxury Experiences Since 1990</p>
         </div>
 

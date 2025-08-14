@@ -34,7 +34,7 @@ const FounderSection = () => {
       <div className="sticky top-0 h-screen w-full z-0">
         <motion.div
           style={{ opacity: bgOpacity }}
-          className="absolute inset-0 bg-[url('/showroom.jpg')] bg-cover bg-center"
+          className="absolute inset-0 bg-[url('/showroom.jpeg')] bg-cover bg-center"
         >
           <div className="absolute inset-0 bg-black opacity-70"></div>
         </motion.div>
@@ -59,8 +59,8 @@ const FounderSection = () => {
           {/* Image */}
           <div className="w-[332px] h-[523px] overflow-hidden flex-shrink-0 relative">
             <Image
-              src="/sunny.png"
-              alt="Sunny"
+              src="/shreyans.jpeg"
+              alt="shreyans"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 332px"
@@ -77,7 +77,7 @@ const FounderSection = () => {
               </h3>
             </div>
             <h4 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
-              Sunny
+            Shreyans Daga
             </h4>
             <p className="text-base sm:text-lg md:text-xl leading-relaxed">
               Cars and working with cars is my passion. With this showroom, I
