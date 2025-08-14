@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
+import Image from "next/image"
 
 interface Car {
   id: number
@@ -60,19 +61,19 @@ const CarList = () => {
     return indices.map((index) => cars[index])
   }
 
-  // Variants for smoother transitions
-  const cardVariants = {
+  // Variants with correct typing
+  const cardVariants: Variants = {
     enter: (dir: number) => ({
       x: dir > 0 ? 300 : -300,
       opacity: 0,
       scale: 0.9,
     }),
-    center: (index: number) => ({
+    center: ({ index }: { index: number }) => ({
       x: 0,
       opacity: index === 1 ? 1 : 0.6,
       scale: index === 1 ? 1 : 0.92,
       transition: {
-        x: { type: 'spring', stiffness: 300, damping: 30 },
+        x: { type: 'spring' as const, stiffness: 300, damping: 30 },
         opacity: { duration: 0.4 },
         scale: { duration: 0.4 },
       },
@@ -130,7 +131,7 @@ const CarList = () => {
               {visibleCars().map((car, index) => (
                 <motion.div
                   key={car.id}
-                  custom={index === 1 ? 0 : direction}
+                  custom={index === 1 ? { index: 1 } : { index }}
                   variants={cardVariants}
                   initial="enter"
                   animate="center"
@@ -142,7 +143,7 @@ const CarList = () => {
                       : 'hidden sm:flex w-64 sm:w-72 md:w-80 h-72 sm:h-80 md:h-96'
                   }`}
                 >
-                  <img src={car.image} alt={car.model} className="w-full h-full object-cover" />
+                  <Image src={car.image} alt={car.model} className="w-full h-full object-cover" />
                   {index !== 1 && (
                     <div
                       className={`absolute inset-0 ${

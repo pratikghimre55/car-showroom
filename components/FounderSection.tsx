@@ -2,6 +2,7 @@
 
 import { useScroll, useTransform, motion } from 'framer-motion'
 import { useRef } from 'react'
+import Image from 'next/image'
 
 const FounderSection = () => {
   const sectionRef = useRef(null)
@@ -56,11 +57,14 @@ const FounderSection = () => {
       >
         <div className="w-full max-w-6xl mx-auto px-6 sm:px-12 py-24 sm:py-32 flex flex-col sm:flex-row items-center sm:items-start">
           {/* Image */}
-          <div className="w-[332px] h-[523px] overflow-hidden flex-shrink-0">
-            <img
-              src="sunny.png"
+          <div className="w-[332px] h-[523px] overflow-hidden flex-shrink-0 relative">
+            <Image
+              src="/sunny.png"
               alt="Sunny"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 332px"
+              priority
             />
           </div>
 
@@ -72,9 +76,18 @@ const FounderSection = () => {
                 <span className="font-normal">FOUNDER</span>
               </h3>
             </div>
-            <h4 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">Sunny</h4>
+            <h4 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
+              Sunny
+            </h4>
             <p className="text-base sm:text-lg md:text-xl leading-relaxed">
-              Cars and working with cars is my passion. With this showroom, I converted my passion into my business. With god's grace and customer's support, we have scaled new highs year on year. Transparency and Trust are the keywords for us. Grew up watching luxury cars, we always dreamt of owning one myself. Little did I know that our dream would take this shape. Now our only passion is to convert other's dreams of owning a premium car into reality.
+              Cars and working with cars is my passion. With this showroom, I
+              converted my passion into my business. With god&apos;s grace and
+              customer&apos;s support, we have scaled new highs year on year.
+              Transparency and Trust are the keywords for us. Grew up watching
+              luxury cars, we always dreamt of owning one myself. Little did I
+              know that our dream would take this shape. Now our only passion is
+              to convert other&apos;s dreams of owning a premium car into
+              reality.
             </p>
           </div>
         </div>
