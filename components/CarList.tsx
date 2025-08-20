@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence, Variants } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 import Image from 'next/image'
 
@@ -13,6 +13,16 @@ interface Car {
   year: number
   transmission: string
   kmDriven: string
+  owner: string
+  location: string
+  price: number
+  featured: boolean
+  // ✅ Added optional icon fields so no `any` is needed
+  rupeeIcon?: string
+  dateIcon?: string
+  steeringIcon?: string
+  speedometerIcon?: string
+  locationIcon?: string
 }
 
 const CarList = () => {
@@ -20,21 +30,25 @@ const CarList = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [direction, setDirection] = useState(0)
 
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const response = await fetch('/api/cars', {
-          next: { revalidate: 3600 },
-        })
-        if (!response.ok) throw new Error('Failed to fetch cars')
-
-        const data: Car[] = await response.json()
-        setCars(data)
-        setLoading(false)
+        const res = await fetch('/api/cars', { next: { revalidate: 3600 } })
+        if (!res.ok) throw new Error('Failed to fetch cars')
+        const data: Car[] = await res.json()
+        const featuredCars = data.filter(c => c.featured).map(car => ({
+          ...car,
+          rupeeIcon: '/rupee.png',
+          dateIcon: '/date.png',
+          steeringIcon: '/steering.png',
+          speedometerIcon: '/speedometer.png',
+          locationIcon: '/location.png',
+        }))
+        setCars(featuredCars)
       } catch {
-        setError('Failed to load cars')
+        setError('Failed to load featured cars')
+      } finally {
         setLoading(false)
       }
     }
@@ -42,149 +56,128 @@ const CarList = () => {
   }, [])
 
   const handleNext = () => {
-    setDirection(1)
-    setCurrentIndex((prev) => (prev + 1) % cars.length)
+    setCurrentIndex(prev => (prev + 1) % cars.length)
   }
 
   const handlePrev = () => {
-    setDirection(-1)
-    setCurrentIndex((prev) => (prev - 1 + cars.length) % cars.length)
-  }
-
-  const visibleCars = () => {
-    if (cars.length === 0) return []
-    const indices = [
-      (currentIndex - 1 + cars.length) % cars.length,
-      currentIndex,
-      (currentIndex + 1) % cars.length,
-    ]
-    return indices.map((index) => cars[index])
-  }
-
-  // Variants with correct typing
-  const cardVariants: Variants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 300 : -300,
-      opacity: 0,
-      scale: 0.9,
-    }),
-    center: ({ index }: { index: number }) => ({
-      x: 0,
-      opacity: index === 1 ? 1 : 0.6,
-      scale: index === 1 ? 1 : 0.92,
-      transition: {
-        x: { type: 'spring' as const, stiffness: 300, damping: 30 },
-        opacity: { duration: 0.4 },
-        scale: { duration: 0.4 },
-      },
-    }),
-    exit: (dir: number) => ({
-      x: dir > 0 ? -300 : 300,
-      opacity: 0,
-      scale: 0.9,
-    }),
+    setCurrentIndex(prev => (prev - 1 + cars.length) % cars.length)
   }
 
   if (loading || error) {
     return (
-      <section className="relative min-h-screen w-full bg-black py-12 sm:py-16">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center mb-8 md:mb-12">
-          FEATURED CARS
+      <section className="relative min-h-screen w-full bg-black py-16">
+        <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-12">
+          Featured Cars
         </h2>
         <div className="text-center text-white">
-          {loading ? 'Loading...' : <span className="text-red-500">{error}</span>}
+          {loading ? 'Loading…' : <span className="text-red-500">{error}</span>}
         </div>
       </section>
     )
   }
 
+  // pick center card details
+  const centerIndex = currentIndex % cars.length
+  const centerCar = cars[centerIndex]
+
   return (
-    <section id="cars" className="relative min-h-screen w-full bg-black py-12 sm:py-16">
-      {/* Heading */}
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center mb-8 md:mb-12">
-        FEATURED CARS
+    <section id="cars" className="relative min-h-screen w-full bg-black py-16 overflow-hidden">
+      <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-10">
+        Featured Cars
       </h2>
 
-      <div className="relative max-w-[90%] sm:max-w-6xl mx-auto px-4">
-        {/* Fade overlays */}
-        <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent z-10" />
-        <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent z-10" />
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+        {/* Carousel */}
+        <div className="relative overflow-hidden">
+          <motion.div
+            className="flex gap-6"
+            animate={{ x: `calc(50% - ${(currentIndex + 0.5) * (100 / 3)}%)` }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
+          >
+            {[...cars, ...cars].map((car, i) => (
+              <div
+                key={`${car.id}-${i}`}
+                className="relative w-[calc(100%/3)] h-80 flex-shrink-0 rounded-2xl overflow-hidden shadow-lg"
+              >
+                <Image
+                  src={car.image}
+                  alt={`${car.brand} ${car.model}`}
+                  fill
+                  className="object-cover rounded-2xl"
+                />
+              </div>
+            ))}
+          </motion.div>
 
-        {/* Arrows */}
+          {/* Fading edges */}
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-black to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-black to-transparent" />
+        </div>
+
+        {/* Details under center card */}
+        {cars.length > 0 && (
+          <AnimatePresence>
+            <motion.div
+              key={centerCar.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="text-center text-white mt-12"
+            >
+              <div className="flex justify-center mb-4">
+                <Image
+                  src={`/car-brands/${centerCar.brand.toLowerCase()}.png`}
+                  alt={centerCar.brand}
+                  width={70}
+                  height={70}
+                  className="rounded-full"
+                />
+              </div>
+              <h3 className="text-2xl font-semibold">
+                {centerCar.brand} {centerCar.model}
+              </h3>
+              <p className="text-gray-300 mt-1">₹ {centerCar.price.toLocaleString()}</p>
+
+              <hr className="my-4 border-gray-700 w-2/3 mx-auto" />
+
+              <div className="grid grid-cols-4 gap-6 max-w-lg mx-auto">
+                <div className="flex flex-col items-center">
+                  <Image src={centerCar.dateIcon!} alt="Date" width={28} height={28} />
+                  <p className="text-gray-300 mt-1">{centerCar.year}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Image src={centerCar.steeringIcon!} alt="Owner" width={28} height={28} />
+                  <p className="text-gray-300 mt-1">{centerCar.owner}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Image src={centerCar.speedometerIcon!} alt="KM" width={28} height={28} />
+                  <p className="text-gray-300 mt-1">{centerCar.kmDriven}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <Image src={centerCar.locationIcon!} alt="Location" width={28} height={28} />
+                  <p className="text-gray-300 mt-1">{centerCar.location}</p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        )}
+
+        {/* Nav arrows */}
         <button
           onClick={handlePrev}
-          className="absolute -left-12 text-white text-3xl p-3 hover:bg-white/10 rounded-full z-20"
+          className="absolute left-4 top-1/2 translate-y-[60%] z-10 bg-white/10 p-3 rounded-full hover:bg-white/20 border border-white/30"
         >
-          <FiArrowLeft />
+          <FiArrowLeft className="text-white text-2xl" />
         </button>
         <button
           onClick={handleNext}
-          className="absolute -right-12 text-white text-3xl p-3 hover:bg-white/10 rounded-full z-20"
+          className="absolute right-4 top-1/2 translate-y-[60%] z-10 bg-white/10 p-3 rounded-full hover:bg-white/20 border border-white/30"
         >
-          <FiArrowRight />
+          <FiArrowRight className="text-white text-2xl" />
         </button>
 
-        {/* Carousel */}
-        <div className="flex items-center justify-center">
-          <div className="flex justify-center gap-4 overflow-hidden">
-            <AnimatePresence initial={false} custom={direction}>
-              {visibleCars().map((car, index) => (
-                <motion.div
-                  key={car.id}
-                  custom={index === 1 ? { index: 1 } : { index }}
-                  variants={cardVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.6, ease: 'easeInOut' }}
-                  className={`relative rounded-lg overflow-hidden ${
-                    index === 1
-                      ? 'w-104 sm:w-120 md:w-136 h-120 sm:h-136 md:h-156 shadow-lg'
-                      : 'hidden sm:flex w-64 sm:w-72 md:w-80 h-72 sm:h-80 md:h-96'
-                  }`}
-                >
-                  <Image
-                    src={car.image}
-                    alt={car.model}
-                    width={800} 
-                    height={600}
-                    className="w-full h-full object-cover"
-                  />
-                  {index !== 1 && (
-                    <div
-                      className={`absolute inset-0 ${
-                        index === 0
-                          ? 'bg-gradient-to-l from-black/60 to-transparent'
-                          : 'bg-gradient-to-r from-black/60 to-transparent'
-                      }`}
-                    />
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* Car details */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={cars[currentIndex].id}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.5 }}
-            className="text-center text-white mt-8"
-          >
-            <h3 className="text-2xl font-bold">
-              {cars[currentIndex].brand} {cars[currentIndex].model}
-            </h3>
-            <p className="text-gray-300">Year: {cars[currentIndex].year}</p>
-            <p className="text-gray-300">Transmission: {cars[currentIndex].transmission}</p>
-            <p className="text-gray-300">KM Driven: {cars[currentIndex].kmDriven}</p>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Button */}
+        {/* CTA */}
         <div className="text-center mt-10">
           <a
             href="/cars"

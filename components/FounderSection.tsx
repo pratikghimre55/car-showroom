@@ -34,9 +34,9 @@ const FounderSection = () => {
       <div className="sticky top-0 h-screen w-full z-0">
         <motion.div
           style={{ opacity: bgOpacity }}
-          className="absolute inset-0 bg-[url('/showroom.jpeg')] bg-cover bg-center"
+          className="absolute inset-0 bg-[url('/x3.webp')] bg-cover bg-center"
         >
-          <div className="absolute inset-0 bg-black opacity-70"></div>
+          <div className="absolute inset-0 bg-black opacity-50"></div>
         </motion.div>
 
         {/* WHO ARE WE Heading */}
@@ -80,14 +80,10 @@ const FounderSection = () => {
             Shreyans Daga
             </h4>
             <p className="text-base sm:text-lg md:text-xl leading-relaxed">
-              Cars and working with cars is my passion. With this showroom, I
-              converted my passion into my business. With god&apos;s grace and
-              customer&apos;s support, we have scaled new highs year on year.
-              Transparency and Trust are the keywords for us. Grew up watching
-              luxury cars, we always dreamt of owning one myself. Little did I
-              know that our dream would take this shape. Now our only passion is
-              to convert other&apos;s dreams of owning a premium car into
-              reality.
+            Cars have always been more than machines to me—they are passion, art, and aspiration. With this showroom, that passion transformed into a business built on trust and excellence. What began as a dream of experiencing luxury cars has today grown, with the blessings of God and the unwavering support of our customers, into a brand that continues to set new benchmarks year after year.
+            </p>
+            <p className="text-base sm:text-lg md:text-xl leading-relaxed">
+            For us, Transparency and Trust are not just words—they are our foundation. Every customer who walks through our doors is not just buying a car, they are fulfilling a dream. Our mission is simple yet profound: to make the dream of owning a premium car a reality, with the elegance, assurance, and exclusivity it deserves.
             </p>
           </div>
         </div>

@@ -35,6 +35,10 @@ export async function GET() {
       year: car.year || 2023,
       transmission: car.transmission || 'Automatic',
       kmDriven: `${car.km || 0} ${car.kmUnit || 'km'}`,
+      owner: car.owner || '1st', // Default value for owner
+      location: car.location || 'Unknown', // Default value for location
+      price: car.price || Math.floor(Math.random() * 5000000) + 2000000, // Random price between 2M and 7M
+      featured: car.featured === 'true' || Math.random() > 0.5, // Randomly set featured (50% chance)
     }))
 
     return NextResponse.json(formattedCars, {

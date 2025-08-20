@@ -63,7 +63,7 @@ const StatsSection = () => {
       className="relative min-h-screen w-full bg-[url('/showroom01.jpg')] bg-cover bg-center flex flex-col items-center justify-center text-white py-16 sm:py-20 overflow-hidden"
     >
       {/* Black overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-70 z-0" />
+      <div className="absolute inset-0 bg-black bg-opacity-85 z-0" />
 
       {/* Stats */}
       <motion.div
